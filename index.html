@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0d0b0d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f3f6" media="(prefers-color-scheme: light)">
+<meta name="description" content="寻梦 AI 的最新可用地址。打开后自动测出你这里最快的一条线路。">
+<title>寻梦 AI · 最新地址</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+/* 不引用任何外部字体、脚本、样式：这一页要在主站打不开的网络里也能秒开。
+   写法照顾旧内核（国内安卓浏览器常见 Chrome 7x）：不用 oklch、flex gap、inset、可选链。 */
+:root {
+  --bg: #0d0b0d;
+  --surface: #171317;
+  --line: #2a242a;
+  --text: #f3eef1;
+  --muted: #a0969c;
+  --accent: #ff5ea8;
+  --btn: #c8175f;
+  --btn-press: #a81250;
+  --btn-text: #ffffff;
+  --ok: #58c994;
+  --slow: #e0a84a;
+  --bad: #8c8389;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f3f6;
+    --surface: #ffffff;
+    --line: #e6dfe4;
+    --text: #1e171b;
+    --muted: #6d6268;
+    --accent: #b81457;
+    --btn: #b81457;
+    --btn-press: #99104a;
+    --ok: #17794d;
+    --slow: #96610a;
+    --bad: #857b81;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "HarmonyOS Sans SC",
+    "MiSans", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  padding: 28px 16px 40px;
+  padding-top: calc(28px + env(safe-area-inset-top));
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  -webkit-text-size-adjust: 100%;
+}
+
+.wrap { max-width: 460px; margin: 0 auto; }
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 抬头 */
+.brand { display: flex; align-items: center; margin-bottom: 36px; }
+.brand svg { width: 34px; height: 34px; flex: none; margin-right: 10px; }
+.brand b { font-size: 18px; font-weight: 700; }
+.brand span { margin-left: auto; font-size: 13px; color: var(--muted); }
+
+/* 最快线路 */
+.state { font-size: 14px; color: var(--muted); min-height: 22px; }
+.host {
+  margin: 4px 0 6px;
+  font-size: 38px; line-height: 1.15; font-weight: 800;
+  letter-spacing: -0.5px;
+  overflow-wrap: anywhere; word-break: break-word;
+}
+.detail { font-size: 14px; color: var(--muted); min-height: 22px; }
+.detail .ms { color: var(--text); font-variant-numeric: tabular-nums; }
+
+.enter {
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 22px; height: 54px;
+  border-radius: 14px;
+  background: var(--btn); color: var(--btn-text);
+  font-size: 17px; font-weight: 700;
+  transition: background-color .15s;
+}
+.enter:hover { background: var(--btn-press); }
+.enter:active { background: var(--btn-press); transform: translateY(1px); }
+.enter svg { width: 18px; height: 18px; margin-left: 8px; }
+
+/* 小标题 */
+.head { display: flex; align-items: baseline; margin: 40px 0 10px; }
+.head h2 { font-size: 14px; font-weight: 600; color: var(--muted); }
+.retest { margin-left: auto; padding: 6px 0 6px 12px; font-size: 14px; color: var(--accent); }
+.retest:disabled { color: var(--muted); cursor: default; }
+
+/* 行 */
+.rows { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.row {
+  display: flex; align-items: center; width: 100%;
+  min-height: 60px; padding: 10px 16px;
+  text-align: left;
+  border-top: 1px solid var(--line);
+  transition: background-color .15s;
+}
+.row:first-child { border-top: 0; }
+.row:hover { background: rgba(128, 112, 122, .1); }
+.row .main { flex: 1; min-width: 0; margin-right: 12px; }
+.row .t { display: block; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.row .s { display: block; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.row .side { flex: none; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row .side.ok { color: var(--ok); }
+.row .side.slow { color: var(--slow); }
+.row .side.bad { color: var(--bad); }
+.row.dead .t { color: var(--muted); }
+.row .side svg { width: 16px; height: 16px; vertical-align: -3px; }
+
+.note { margin-top: 12px; font-size: 13px; color: var(--muted); }
+
+footer { margin-top: 44px; font-size: 12px; color: var(--muted); }
+
+/* 复制后的提示 */
+.toast {
+  position: fixed; left: 50%; bottom: 28px;
+  bottom: calc(28px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 10px 16px; border-radius: 10px;
+  background: var(--text); color: var(--bg);
+  font-size: 14px;
+}
+.toast[hidden] { display: none; }
+
+@media (max-width: 360px) {
+  .host { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="brand">
+    <svg viewBox="0 0 256 256" aria-hidden="true">
+      <defs>
+        <g id="petal">
+          <path d="M128 22C151 45 155 70 128 108C101 70 105 45 128 22Z" fill="#B81457"/>
+          <path d="M128 32C113 51 111 70 128 98C120 73 121 52 128 32Z" fill="#F23891"/>
+          <path d="M128 43C141 61 142 78 128 98C133 77 133 59 128 43Z" fill="#681044"/>
+        </g>
+        <path id="needle" d="M128 7L137 28H119L128 7Z" fill="#9D2EEA"/>
+      </defs>
+      <use href="#petal"/>
+      <use href="#petal" transform="rotate(90 128 128)"/>
+      <use href="#petal" transform="rotate(180 128 128)"/>
+      <use href="#petal" transform="rotate(270 128 128)"/>
+      <use href="#needle"/>
+      <use href="#needle" transform="rotate(90 128 128)"/>
+      <use href="#needle" transform="rotate(180 128 128)"/>
+      <use href="#needle" transform="rotate(270 128 128)"/>
+      <path d="M128 96C134 117 139 122 160 128C139 134 134 139 128 160C122 139 117 134 96 128C117 122 122 117 128 96Z" fill="#FFD6E8"/>
+      <path d="M128 111C132 121 135 124 145 128C135 132 132 135 128 145C124 135 121 132 111 128C121 124 124 121 128 111Z" fill="#FF4A9E"/>
+    </svg>
+    <b>寻梦 AI</b>
+    <span>最新地址</span>
+  </header>
+
+  <section aria-live="polite">
+    <p class="state" id="state">正在测速</p>
+    <h1 class="host" id="host">xunmeng.ai</h1>
+    <p class="detail" id="detail">不用等，现在就能进</p>
+    <a class="enter" id="enter" href="https://xunmeng.ai" target="_blank" rel="noopener">
+      进入寻梦
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </section>
+
+  <div class="head">
+    <h2>全部线路</h2>
+    <button class="retest" id="retest" type="button">重新测速</button>
+  </div>
+  <div class="rows" id="lines">
+    <!-- 这两行是 sites.txt 读不到时的兜底；平时由脚本按 sites.txt 重画。 -->
+    <a class="row" data-host="xunmeng.ai" href="https://xunmeng.ai" target="_blank" rel="noopener">
+      <span class="main"><span class="t">xunmeng.ai</span><span class="s">国内线路</span></span>
+      <span class="side">测速中</span>
+    </a>
+    <a class="row" data-host="seekdream.ai" href="https://seekdream.ai" target="_blank" rel="noopener">
+      <span class="main"><span class="t">seekdream.ai</span><span class="s">海外线路</span></span>
+      <span class="side">测速中</span>
+    </a>
+  </div>
+
+  <div class="head"><h2>找不到我们的时候</h2></div>
+  <div class="rows">
+    <button class="row" type="button" id="copy-page">
+      <span class="main"><span class="t">收藏这一页</span><span class="s" id="page-url">地址换了会第一时间更新在这里</span></span>
+      <span class="side">复制地址</span>
+    </button>
+    <a class="row" href="https://t.me/xunmeng_ai" target="_blank" rel="noopener">
+      <span class="main"><span class="t">Telegram 频道</span><span class="s">@xunmeng_ai</span></span>
+      <span class="side"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+    <button class="row" type="button" id="copy-mail" data-mail="support@seekdream.ai">
+      <span class="main"><span class="t">客服邮箱</span><span class="s">support@seekdream.ai</span></span>
+      <span class="side">复制</span>
+    </button>
+    <a class="row" id="download" href="https://xunmeng.ai/download" target="_blank" rel="noopener">
+      <span class="main"><span class="t">下载 App</span><span class="s">装了 App，换地址也不用再找</span></span>
+      <span class="side"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+  </div>
+  <p class="note">电脑按 Ctrl + D（Mac 按 ⌘ + D）收藏；手机在浏览器的分享菜单里选“添加到主屏幕”。</p>
+
+  <footer>寻梦 AI 仅面向年满 18 岁的成年人。</footer>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var ROUNDS = 3;          // 每条线路同时测 3 次，取中位数
+  var TIMEOUT_MS = 6000;   // 被封的域名一般一两秒就断；慢但能用的可能要四五秒，所以放到 6 秒
+  var HOST_RE = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var stateEl = $('state'), hostEl = $('host'), detailEl = $('detail'), enterEl = $('enter');
+  var listEl = $('lines'), retestEl = $('retest'), downloadEl = $('download'), toastEl = $('toast');
+  var now = function () { return (window.performance && performance.now) ? performance.now() : Date.now(); };
+
+  // ---- 线路清单 ---------------------------------------------------------
+  function parseSites(text) {
+    var out = [], seen = {};
+    text.split(/\r?\n/).forEach(function (raw) {
+      var line = raw.replace(/#.*$/, '').trim();
+      if (!line) return;
+      var cut = line.search(/\s/);
+      var host = (cut === -1 ? line : line.slice(0, cut)).toLowerCase();
+      var label = cut === -1 ? '' : line.slice(cut).trim();
+      if (!HOST_RE.test(host) || seen[host]) return;   // 不合格式的行直接丢掉，免得拼出奇怪的链接
+      seen[host] = true;
+      out.push({ host: host, label: label });
+    });
+    return out;
+  }
+
+  function span(cls, text) {
+    var el = document.createElement('span');
+    el.className = cls;
+    el.textContent = text;
+    return el;
+  }
+
+  function drawRows(sites) {
+    listEl.textContent = '';
+    sites.forEach(function (s) {
+      var a = document.createElement('a');
+      a.className = 'row';
+      a.href = 'https://' + s.host;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.setAttribute('data-host', s.host);
+      var main = span('main', '');
+      main.appendChild(span('t', s.host));
+      if (s.label) main.appendChild(span('s', s.label));
+      a.appendChild(main);
+      a.appendChild(span('side', '测速中'));
+      listEl.appendChild(a);
+    });
+  }
+
+  function rows() { return Array.prototype.slice.call(listEl.querySelectorAll('.row')); }
+
+  // ---- 测速 -------------------------------------------------------------
+  // 用加载图片来测：不需要主站开跨域，而且只有真的拿到一张图才算通——
+  // 被劫持到别的页面、或者返回错误页的线路，图片解不出来，会算作打不开。
+  function probeOnce(host) {
+    return new Promise(function (resolve) {
+      var img = new Image(), t0 = now(), settled = false;
+      function finish(v) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        img.onload = img.onerror = null;
+        if (v == null) img.src = '';   // 超时后不再占着连接
+        resolve(v);
+      }
+      var timer = setTimeout(function () { finish(null); }, TIMEOUT_MS);
+      img.onload = function () { finish(now() - t0); };
+      img.onerror = function () { finish(null); };
+      img.referrerPolicy = 'no-referrer';
+      img.src = 'https://' + host + '/favicon.ico?_=' + Date.now() + Math.random().toString(36).slice(2);
+    });
+  }
+
+  function probeHost(host) {
+    var jobs = [];
+    for (var i = 0; i < ROUNDS; i++) jobs.push(probeOnce(host));
+    return Promise.all(jobs).then(function (samples) {
+      var ok = samples.filter(function (x) { return x != null; }).sort(function (a, b) { return a - b; });
+      return { host: host, ms: ok.length ? ok[Math.floor((ok.length - 1) / 2)] : null };
+    });
+  }
+
+  function setSide(row, cls, text) {
+    var el = row.querySelector('.side');
+    el.className = 'side' + (cls ? ' ' + cls : '');
+    el.textContent = text;
+  }
+
+  function pointTo(host) {
+    hostEl.textContent = host;
+    enterEl.href = 'https://' + host;
+    downloadEl.href = 'https://' + host + '/download';
+  }
+
+  var runId = 0;
+  function run() {
+    var rs = rows();
+    if (!rs.length) return;
+    var mine = ++runId, results = [], best = null, left = rs.length, done = false;
+
+    retestEl.disabled = true;
+    rs.forEach(function (r) { r.classList.remove('dead'); setSide(r, '', '测速中'); });
+    pointTo(rs[0].getAttribute('data-host'));
+    stateEl.textContent = '正在测速';
+    detailEl.textContent = '不用等，现在就能进';
+
+    function finalize() {
+      if (done || mine !== runId) return;
+      done = true;
+      rs.forEach(function (r) {   // 到点还没结果的，按打不开算
+        if (!results.some(function (x) { return x.row === r; })) {
+          results.push({ row: r, host: r.getAttribute('data-host'), ms: null });
+          r.classList.add('dead');
+          setSide(r, 'bad', '打不开');
+        }
+      });
+      results.sort(function (a, b) {
+        if ((a.ms == null) !== (b.ms == null)) return a.ms == null ? 1 : -1;
+        return a.ms == null ? 0 : a.ms - b.ms;
+      });
+      results.forEach(function (x) { listEl.appendChild(x.row); });
+      var okCount = results.filter(function (x) { return x.ms != null; }).length;
+      if (okCount) {
+        pointTo(results[0].host);
+        stateEl.textContent = '你这里最快的线路';
+        detailEl.textContent = '';
+        detailEl.appendChild(span('ms', Math.round(results[0].ms) + ' 毫秒'));
+        detailEl.appendChild(document.createTextNode('，' + results.length + ' 条线路里 ' + okCount + ' 条能用'));
+      } else {
+        stateEl.textContent = '这几条线路现在都连不上';
+        detailEl.textContent = '换个网络再测一次，或者从下面的 Telegram 频道拿新地址';
+      }
+      retestEl.disabled = false;
+    }
+
+    rs.forEach(function (r) {
+      probeHost(r.getAttribute('data-host')).then(function (res) {
+        if (done || mine !== runId) return;
+        res.row = r;
+        results.push(res);
+        if (res.ms == null) {
+          r.classList.add('dead');
+          setSide(r, 'bad', '打不开');
+        } else {
+          setSide(r, res.ms < 2000 ? 'ok' : 'slow', Math.round(res.ms) + ' 毫秒');
+          if (!best || res.ms < best.ms) {   // 一出现更快的就先换上去，不等全部测完
+            best = res;
+            pointTo(res.host);
+          }
+        }
+        if (--left === 0) finalize();
+      });
+    });
+
+    setTimeout(finalize, TIMEOUT_MS + 1000);   // 兜底：再慢也在这里收尾，不会一直停在“测速中”
+  }
+
+  // ---- 复制 -------------------------------------------------------------
+  var toastTimer = null;
+  function toast(text) {
+    toastEl.textContent = text;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2600);
+  }
+
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { ta.setSelectionRange(0, text.length); } catch (e) {}
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copy(text, okText) {
+    function report(ok) { toast(ok ? okText : '没能自动复制，请手动抄一下：' + text); }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { report(true); }, function () { report(legacyCopy(text)); });
+    } else {
+      report(legacyCopy(text));
+    }
+  }
+
+  var pageUrl = location.href.split(/[?#]/)[0];
+  if (/^https?:/.test(pageUrl)) $('page-url').textContent = pageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  $('copy-page').addEventListener('click', function () { copy(pageUrl, '这一页的地址已复制'); });
+  $('copy-mail').addEventListener('click', function () {
+    copy(this.getAttribute('data-mail'), '邮箱已复制');
+  });
+
+  // ---- 启动 -------------------------------------------------------------
+  retestEl.addEventListener('click', run);
+
+  if (!window.Promise) {   // 太旧的浏览器：不测速，留着默认入口
+    stateEl.textContent = '默认线路';
+    detailEl.textContent = '这个浏览器太旧，没法测速，可以直接进';
+    rows().forEach(function (r) { setSide(r, '', ''); });
+    retestEl.hidden = true;
+    return;
+  }
+
+  run();   // 先拿页面里写好的兜底清单开测，sites.txt 回来后如果不一样再重测
+
+  if (window.fetch) {
+    fetch('sites.txt', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : ''; })
+      .then(function (text) {
+        var sites = parseSites(text);
+        if (!sites.length) return;
+        var current = rows().map(function (r) {
+          var s = r.querySelector('.s');
+          return r.getAttribute('data-host') + ' ' + (s ? s.textContent : '');
+        }).sort().join('\n');   // 排序后再比：测完的行已按快慢重排过
+        var next = sites.map(function (s) { return s.host + ' ' + s.label; }).sort().join('\n');
+        if (current === next) return;   // 和页面里的兜底清单一样，正在跑的这轮测速照常用
+        drawRows(sites);
+        run();
+      })
+      .catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
