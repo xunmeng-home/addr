@@ -10,6 +10,7 @@
 | --- | --- |
 | `index.html` | 整个页面，样式和脚本都写在里面，不引用任何外部资源 |
 | `sites.txt` | 线路清单，页面打开时读它 |
+| `logo.webp`、`logo.png` | 页头的横向标志，由 Portal 的 `public/brand/xunmeng-ai-logo-v8-horizontal.png` 缩小而来（png 给不认 webp 的旧浏览器） |
 | `favicon.ico`、`apple-touch-icon.png` | 图标，从 Portal 的 `public/` 复制来的 |
 | `.nojekyll` | 让 GitHub Pages 原样发布，不跑 Jekyll |
 

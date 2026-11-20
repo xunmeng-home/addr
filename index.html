@@ -68,8 +68,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 
 /* 抬头 */
 .brand { display: flex; align-items: center; margin-bottom: 36px; }
-.brand svg { width: 34px; height: 34px; flex: none; margin-right: 10px; }
-.brand b { font-size: 18px; font-weight: 700; }
+.brand img { display: block; height: 30px; width: auto; }
 .brand span { margin-left: auto; font-size: 13px; color: var(--muted); }
 
 /* 最快线路 */
@@ -150,27 +149,10 @@ footer { margin-top: 44px; font-size: 12px; color: var(--muted); }
 <main class="wrap">
 
   <header class="brand">
-    <svg viewBox="0 0 256 256" aria-hidden="true">
-      <defs>
-        <g id="petal">
-          <path d="M128 22C151 45 155 70 128 108C101 70 105 45 128 22Z" fill="#B81457"/>
-          <path d="M128 32C113 51 111 70 128 98C120 73 121 52 128 32Z" fill="#F23891"/>
-          <path d="M128 43C141 61 142 78 128 98C133 77 133 59 128 43Z" fill="#681044"/>
-        </g>
-        <path id="needle" d="M128 7L137 28H119L128 7Z" fill="#9D2EEA"/>
-      </defs>
-      <use href="#petal"/>
-      <use href="#petal" transform="rotate(90 128 128)"/>
-      <use href="#petal" transform="rotate(180 128 128)"/>
-      <use href="#petal" transform="rotate(270 128 128)"/>
-      <use href="#needle"/>
-      <use href="#needle" transform="rotate(90 128 128)"/>
-      <use href="#needle" transform="rotate(180 128 128)"/>
-      <use href="#needle" transform="rotate(270 128 128)"/>
-      <path d="M128 96C134 117 139 122 160 128C139 134 134 139 128 160C122 139 117 134 96 128C117 122 122 117 128 96Z" fill="#FFD6E8"/>
-      <path d="M128 111C132 121 135 124 145 128C135 132 132 135 128 145C124 135 121 132 111 128C121 124 124 121 128 111Z" fill="#FF4A9E"/>
-    </svg>
-    <b>寻梦 AI</b>
+    <picture>
+      <source srcset="logo.webp" type="image/webp">
+      <img src="logo.png" alt="寻梦 AI" width="463" height="108">
+    </picture>
     <span>最新地址</span>
   </header>
 
